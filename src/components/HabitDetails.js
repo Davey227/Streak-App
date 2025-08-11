@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Flame, MoreVertical, Trash2, Edit3 } from 'lucide-react';
+import { ArrowLeft, Calendar, Flame, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { api } from '../utils/api';
 import { calculateStreak, formatDate } from '../lib/utils';
