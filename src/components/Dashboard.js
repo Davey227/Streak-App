@@ -16,41 +16,33 @@ export default function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const { toast } = useToast();
 
-import React, { useState, useEffect, useCallback } from 'react';
+  const loadHabits = useCallback(async () => {
+    try {
+      const response = await api.getHabits();
+      setHabits(response.habits);
+    } catch (error) {
+      toast({
+        title: "Error loading habits",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
 
-useEffect(() => {
-  loadHabits();
-}, [loadHabits]); // ✅ depends on the function
-
-
-import React, { useState, useEffect, useCallback } from 'react';
-// make sure useCallback is imported ^
-
-const loadHabits = useCallback(async () => {
-  try {
-    const response = await api.getHabits();
-    setHabits(response.habits);
-  } catch (error) {
-    toast({
-      title: "Error loading habits",
-      description: error.message,
-      variant: "destructive"
-    });
-  } finally {
-    setLoading(false);
-  }
-}, [toast]); // 👈 include any variables used inside that can change
-
-  };
+  useEffect(() => {
+    loadHabits();
+  }, [loadHabits]); // ✅ depends on the function
 
   const handleHabitComplete = async (habitId) => {
     try {
       await triggerHapticFeedback();
-      
+
       const updatedHabit = await api.completeHabit(habitId);
-      
+
       // Update local state
-      setHabits(prev => prev.map(h => 
+      setHabits(prev => prev.map(h =>
         h.id === habitId ? updatedHabit : h
       ));
 
@@ -102,7 +94,7 @@ const loadHabits = useCallback(async () => {
     );
   }
 
-  const todayCompletions = habits.filter(habit => 
+  const todayCompletions = habits.filter(habit =>
     habit.completions.some(c => isToday(c.date))
   ).length;
 
@@ -135,7 +127,7 @@ const loadHabits = useCallback(async () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   className="bg-orange-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${totalHabits > 0 ? (todayCompletions / totalHabits) * 100 : 0}%` }}
                 />
