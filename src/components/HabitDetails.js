@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Flame, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
@@ -13,11 +13,7 @@ export default function HabitDetails() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadHabit();
-  }, [id]);
-
-  const loadHabit = async () => {
+  const loadHabit = useCallback(async () => {
     try {
       const habitData = await api.getHabit(id);
       setHabit(habitData);
@@ -31,7 +27,11 @@ export default function HabitDetails() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate, toast]);
+
+  useEffect(() => {
+    loadHabit();
+  }, [loadHabit]); // ✅ depends on the stable function
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this habit? This cannot be undone.')) {
@@ -83,18 +83,10 @@ export default function HabitDetails() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100">
       {/* Header */}
       <header className="px-6 py-4 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/')}
-        >
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDelete}
-        >
+        <Button variant="ghost" size="icon" onClick={handleDelete}>
           <Trash2 className="h-5 w-5 text-red-500" />
         </Button>
       </header>
@@ -103,7 +95,7 @@ export default function HabitDetails() {
         {/* Habit Header */}
         <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
           <div className="flex items-center gap-4 mb-4">
-            <div 
+            <div
               className="w-16 h-16 rounded-full flex items-center justify-center text-3xl"
               style={{ backgroundColor: habit.color }}
             >
@@ -153,9 +145,7 @@ export default function HabitDetails() {
             <div className="space-y-3">
               {recentCompletions.map((completion, index) => (
                 <div key={index} className="flex items-center justify-between py-2">
-                  <span className="text-gray-900">
-                    {formatDate(completion.date)}
-                  </span>
+                  <span className="text-gray-900">{formatDate(completion.date)}</span>
                   <div className="w-3 h-3 bg-green-500 rounded-full" />
                 </div>
               ))}
