@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Settings, Flame } from 'lucide-react';
 import { Button } from './ui/button';
@@ -16,23 +16,31 @@ export default function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadHabits();
-  }, []);
+import React, { useState, useEffect, useCallback } from 'react';
 
-  const loadHabits = async () => {
-    try {
-      const response = await api.getHabits();
-      setHabits(response.habits);
-    } catch (error) {
-      toast({
-        title: "Error loading habits",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+useEffect(() => {
+  loadHabits();
+}, [loadHabits]); // ✅ depends on the function
+
+
+import React, { useState, useEffect, useCallback } from 'react';
+// make sure useCallback is imported ^
+
+const loadHabits = useCallback(async () => {
+  try {
+    const response = await api.getHabits();
+    setHabits(response.habits);
+  } catch (error) {
+    toast({
+      title: "Error loading habits",
+      description: error.message,
+      variant: "destructive"
+    });
+  } finally {
+    setLoading(false);
+  }
+}, [toast]); // 👈 include any variables used inside that can change
+
   };
 
   const handleHabitComplete = async (habitId) => {
